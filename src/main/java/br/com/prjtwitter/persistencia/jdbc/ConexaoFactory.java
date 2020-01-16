@@ -15,7 +15,7 @@ public class ConexaoFactory {
 		
 		try {
 			Class.forName("org.postgresql.Driver"); //forca o carregamento do driver jdbc  
-			return DriverManager.getConnection("jdbc:postgresql://ec2-34-193-42-173.compute-1.amazonaws.com:5432/defc4rtlrifmnu?sslmode=require", "ngzuzzzgrancrd", "7bb5de600a4f6017e845ba3d230515ccf0236fef85c0eef03d53790291c2f766");
+			return DriverManager.getConnection("jdbc:postgresql://ec2-174-129-255-21.compute-1.amazonaws.com:5432/d5k0j7m4tn8ia8?sslmode=require", "pdedadntpijtjx", "7c72a0a68f5534dfbe721eab3b27a50656f1bee7e1cb27612a2aa2eed40f62d3");
 			//return DriverManager.getConnection("jdbc:postgresql://ec2-174-129-32-200.compute-1.amazonaws.com:5432/d7jptuvm5p7jtb?sslmode=require", "eptfscqhlwyjsp", "9c71100c726aa1c5b59c31db3e3e80a222f0cacb222ae17c9bffcccefa2d3376");
 			//return DriverManager.getConnection("jdbc:postgresql://localhost:5432/Twitter-watcher", "postgres", "postgres");
 		} catch (SQLException e) {
