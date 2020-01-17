@@ -1,6 +1,8 @@
 package br.com.prjtwitter.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import br.com.prjtwitter.entidade.Config;
 import br.com.prjtwitter.entidade.Hashtag;
 import br.com.prjtwitter.entidade.Tweet;
+import br.com.prjtwitter.persistencia.jdbc.ConexaoFactory;
 import br.com.prjtwitter.persistencia.jdbc.ConfigDAO;
 import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
 import br.com.prjtwitter.persistencia.jdbc.TweetDAO;
@@ -44,15 +47,30 @@ public class SystemController extends HttpServlet {
 	
 	private ConfigDAO configDAO = null; 
 	private Config config = null;
+	private Connection conexao;
 	
 	@Override
 	public void init() throws ServletException {
 		// TODO Auto-generated method stub
 		super.init();
-		configDAO = new ConfigDAO();
+		this.conexao = ConexaoFactory.getConnection();
+		configDAO = new ConfigDAO(this.conexao);
 		config = configDAO.buscarPorId(1); 
+
 	}
 
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		try {
+			this.conexao.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.destroy();
+	}
+	
 	/**
 	 * http://localhost:8080/prjTwitter/SystemController?operacao=<Operacao>
 	 * Operacoes: 
@@ -119,7 +137,7 @@ public class SystemController extends HttpServlet {
 	 * Busca Tweets no Tweeter
 	 */
 	private void getTweets(){
-		ConfigDAO configDAO = new ConfigDAO(); 
+		ConfigDAO configDAO = new ConfigDAO(this.conexao); 
 		Config config = configDAO.buscarPorId(1); 
 		
 		ConfigurationBuilder cb = new ConfigurationBuilder(); 
@@ -140,7 +158,7 @@ public class SystemController extends HttpServlet {
 
 		
 		//Busca todas as Hashtags cadastradas
-		HashtagDAO hashtagDao = new HashtagDAO(); 
+		HashtagDAO hashtagDao = new HashtagDAO(this.conexao); 
 		List<Hashtag> listaHastag = hashtagDao.buscarTudo();
 		for (Hashtag hashtag : listaHastag) {
 			if (hashtag.isStatus() == true) { //se o Status da Hashtag for True, entao busca no Twitter
@@ -162,7 +180,7 @@ public class SystemController extends HttpServlet {
 					QueryResult result = twitter.search(query);
 					List < Status > tweets = result.getTweets();
 					
-					TweetDAO tweetDAO = new TweetDAO(); 
+					TweetDAO tweetDAO = new TweetDAO(this.conexao); 
 		        	Timestamp dataDaPesquisa = new Timestamp(System.currentTimeMillis());
 		        	
 					//System.out.println("Lista de tweets OK2 " + tweets.size()+" " + tweets.toString()) ;

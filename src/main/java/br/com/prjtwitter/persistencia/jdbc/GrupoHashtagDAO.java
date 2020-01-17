@@ -18,13 +18,27 @@ import br.com.prjtwitter.entidade.Hashtag;
 
 public class GrupoHashtagDAO {
 	//pega conexao 
-	private Connection conexao = ConexaoFactory.getConnection();
+	private Connection conexao;
 	
+	
+	
+	public GrupoHashtagDAO(Connection conexao) {
+		setConexao(conexao);
+	}
+
+	public Connection getConexao() {
+		return conexao;
+	}
+
+	public void setConexao(Connection conexao) {
+		this.conexao = conexao;
+	}
+
 	/**
 	 * Inserir GrupoHashtags no DB
 	 * @param grupoHashtag (GrupoHashtag)
 	 */
-	public boolean insert(GrupoHashtag grupoHashtag) {
+	public boolean insert(GrupoHashtag grupoHashtag){
 		String sql = "insert into TB_grupo_Hashtags (id_hashtag, id_config, descricao) values (?, ?, ?)";
 		
 		try {
@@ -79,7 +93,7 @@ public class GrupoHashtagDAO {
 	 * Apagar GrupoHashtag do DB
 	 * @param id (int)
 	 */
-	public boolean delete(int id) {
+	public boolean delete(int id){
 		String sql = "delete from TB_grupo_Hashtags  where id = ?";
 
 		try {
@@ -142,7 +156,6 @@ public class GrupoHashtagDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;		
 	}
 	

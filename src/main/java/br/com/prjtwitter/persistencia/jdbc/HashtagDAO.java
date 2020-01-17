@@ -18,15 +18,28 @@ import br.com.prjtwitter.entidade.Hashtag;
 public class HashtagDAO {
 
 	//pega conexao 
-	private Connection conexao = ConexaoFactory.getConnection();
+	private Connection conexao;
 	
 	
+	public HashtagDAO(Connection conexao) {
+		setConexao(conexao);
+	}
+
+	public Connection getConexao() {
+		return conexao;
+	}
+
+	public void setConexao(Connection conexao) {
+		this.conexao = conexao;
+	}
+
 	/**
 	 * Inserir Hashtag no DB
 	 * @param hashtag (Hashtag)
 	 * @return False se ocorrer erro no SQL
+	 * @throws SQLException 
 	 */
-	public boolean insert(Hashtag hashtag) {
+	public boolean insert(Hashtag hashtag){
 		String sql = "insert into TB_hashtag (hashtag, status) values (?, ?)";
 		
 		try {
@@ -51,7 +64,7 @@ public class HashtagDAO {
 	 * Alterar Hashtag no DB
 	 * @param hashtag (Hashtag)
 	 */
-	public boolean update(Hashtag hashtag) {
+	public boolean update(Hashtag hashtag){
 		String sql = "update TB_hashtag set hashtag = ?, status = ? where id = ?";
 		
 		try {
@@ -77,8 +90,9 @@ public class HashtagDAO {
 	/**
 	 * Apagar Haschtag do DB
 	 * @param id (int)
+	 * @throws SQLException 
 	 */
-	public boolean delete(int id) {
+	public boolean delete(int id){
 		String sql = "delete from TB_hashtag  where id = ?";
 
 		try {
@@ -102,6 +116,7 @@ public class HashtagDAO {
 	/**
 	 * Salvar Hashtag se Id = 0 entao insere no DB senao faz update
 	 * @param hashtag
+	 * @throws SQLException 
 	 */
 	public void salvar(Hashtag hashtag){
 		if(hashtag.getId() != 0){
@@ -116,6 +131,7 @@ public class HashtagDAO {
 	 * Buscar todas as Hashtags do DB
 	 * @param id (int)
 	 * @return hashtag (Hashtag)
+	 * @throws SQLException 
 	 */
 	public Hashtag buscarPorId(int id){
 		Hashtag hashtag = new Hashtag(); 
@@ -141,7 +157,6 @@ public class HashtagDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;		
 	}
 	
@@ -176,7 +191,6 @@ public class HashtagDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return lista;		
 	}	
 	

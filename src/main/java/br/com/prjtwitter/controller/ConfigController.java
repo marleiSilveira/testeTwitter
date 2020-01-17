@@ -1,6 +1,8 @@
 package br.com.prjtwitter.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import br.com.prjtwitter.entidade.Config;
 import br.com.prjtwitter.entidade.Config;
 import br.com.prjtwitter.entidade.Hashtag;
+import br.com.prjtwitter.persistencia.jdbc.ConexaoFactory;
 import br.com.prjtwitter.persistencia.jdbc.ConfigDAO;
 import br.com.prjtwitter.persistencia.jdbc.ConfigDAO;
 import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
@@ -25,14 +28,27 @@ import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
 @WebServlet("/ConfigController")
 public class ConfigController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	
+	private Connection conexao;
        
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public ConfigController() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
+		this.conexao = ConexaoFactory.getConnection();
+	}
+	
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		try {
+			this.conexao.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.destroy();
+	}
 
 	/**
 	 * http://localhost:8080/prjTwitter/ConfigController?operacao=<Operacao>&status=<Status>&id=<Id>
@@ -53,13 +69,13 @@ public class ConfigController extends HttpServlet {
 		if (operacao.equals("exc")){
 			//Excluir configuracao
 			String id      = request.getParameter("id");
-			ConfigDAO configDAO = new ConfigDAO(); 
+			ConfigDAO configDAO = new ConfigDAO(this.conexao); 
 			configDAO.delete(Integer.parseInt(id));      
 			response.sendRedirect("ConfigController?operacao=lis"); //recarrega a tela
 					
 		}else if (operacao.equals("lis")){
 			//listar todas as configuracoes
-			ConfigDAO configDAO = new ConfigDAO(); 
+			ConfigDAO configDAO = new ConfigDAO(this.conexao); 
 			List<Config> listaConfig = configDAO.buscarTudo(); 
 			request.setAttribute("lisConfig", listaConfig);
 			request.setAttribute("status", status);
@@ -70,7 +86,7 @@ public class ConfigController extends HttpServlet {
 			//Alterar configuracao 
 			String id      = request.getParameter("id");
 			
-			ConfigDAO configDAO = new ConfigDAO(); 		
+			ConfigDAO configDAO = new ConfigDAO(this.conexao); 		
 			Config config = configDAO.buscarPorId(Integer.parseInt(id));
 			request.setAttribute("con", config);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/formConfig.jsp");
@@ -130,7 +146,7 @@ public class ConfigController extends HttpServlet {
 		
 
 		//grava no DB
-		ConfigDAO configDAO = new ConfigDAO(); 
+		ConfigDAO configDAO = new ConfigDAO(this.conexao); 
 		configDAO.salvar(config);
 		
 		//recarrega a tela

@@ -1,6 +1,8 @@
 package br.com.prjtwitter.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import br.com.prjtwitter.entidade.Hashtag;
 import br.com.prjtwitter.entidade.Tweet;
+import br.com.prjtwitter.persistencia.jdbc.ConexaoFactory;
 import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
 import br.com.prjtwitter.persistencia.jdbc.TweetDAO;
 
@@ -23,6 +26,8 @@ import br.com.prjtwitter.persistencia.jdbc.TweetDAO;
 public class TweetsController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
+	private Connection conexao;
+	
     /**
      * @see HttpServlet#HttpServlet()
      */
@@ -30,7 +35,25 @@ public class TweetsController extends HttpServlet {
         super();
         // TODO Auto-generated constructor stub
     }
+    
+    @Override
+    public void init() throws ServletException {
+    	// TODO Auto-generated method stub
+    	super.init();
+    	this.conexao = ConexaoFactory.getConnection();
+    }
 
+    @Override
+    public void destroy() {
+    	// TODO Auto-generated method stub
+    	try {
+			this.conexao.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	super.destroy();
+    }
 	/**
 	 * http://localhost:8080/prjTwitter/TweetsController?operacao=<Operacao>&id=<Id>
 	 * Operacoes: 
@@ -47,21 +70,21 @@ public class TweetsController extends HttpServlet {
 		if (operacao.equals("exc")){
 			//Excluir Tweet
 			String id      = request.getParameter("id");
-			TweetDAO tweetDAO = new TweetDAO(); 
+			TweetDAO tweetDAO = new TweetDAO(this.conexao); 
 			tweetDAO.delete(Integer.parseInt(id));      
 			//response.getWriter().print("excluido com sucesso");
 			response.sendRedirect("TweetsController?operacao=lis"); //recarrega a tela
 			
 		}else if(operacao.equals("ext")){
 			//Excluir todos os Tweets
-			TweetDAO tweetDAO = new TweetDAO(); 
+			TweetDAO tweetDAO = new TweetDAO(this.conexao); 
 			tweetDAO.deleteAll();      
 			//response.getWriter().print("excluido com sucesso");
 			response.sendRedirect("TweetsController?operacao=lis"); //recarrega a tela			
 		
 		}else if (operacao.equals("lis")){
 			//listar todos os Tweets
-			TweetDAO tweetDAO = new TweetDAO();  
+			TweetDAO tweetDAO = new TweetDAO(this.conexao);  
 			List<Tweet> listaTweets = tweetDAO.buscarTudo(); 
 			//response.getWriter().print(listaHash);
 			request.setAttribute("lisTweets", listaTweets);
@@ -72,7 +95,7 @@ public class TweetsController extends HttpServlet {
 		}else if (operacao.equals("lih")){
 			//listar todos os Tweets de determinada Hashtag
 			String id_hashtag      = request.getParameter("id");
-			TweetDAO tweetDAO = new TweetDAO();  
+			TweetDAO tweetDAO = new TweetDAO(this.conexao);  
 			List<Tweet> listaTweets = tweetDAO.buscarPorHashtag(Integer.parseInt(id_hashtag)); 
 			//response.getWriter().print(listaHash);
 			request.setAttribute("lisTweets", listaTweets);
@@ -83,7 +106,7 @@ public class TweetsController extends HttpServlet {
 			//Alterar hashtag
 			String id      = request.getParameter("id");
 			
-			TweetDAO tweetDAO = new TweetDAO(); 		
+			TweetDAO tweetDAO = new TweetDAO(this.conexao); 		
 			Tweet tweet = tweetDAO.buscarPorId(Integer.parseInt(id));
 			request.setAttribute("twe", tweet);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/formTweets.jsp");
@@ -120,7 +143,7 @@ public class TweetsController extends HttpServlet {
 	//----	tweet.setData_pesquisa(data_pesquisa);
 		
 		//grava no DB
-		TweetDAO tweetDAO = new TweetDAO(); 
+		TweetDAO tweetDAO = new TweetDAO(this.conexao); 
 		tweetDAO.salvar(tweet);
 		
 		//response.getWriter().print("Hashtag Salva");

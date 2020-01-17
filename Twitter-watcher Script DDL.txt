@@ -1,0 +1,84 @@
+-- Script para criar o banco de dados do Twitter-watcher
+
+-- Database: Twitter-watcher
+
+-- DROP DATABASE "Twitter-watcher";
+
+-- Criação do banco de dados
+CREATE DATABASE "Twitter-watcher"
+    WITH 
+    OWNER = postgres
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'Portuguese_Brazil.1252'
+    LC_CTYPE = 'Portuguese_Brazil.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+    
+
+--Drop Table TB_hashtag;
+
+-- Tabela de Hashtags
+CREATE TABLE TB_hashtag(
+   id serial PRIMARY KEY,
+   hashtag VARCHAR (60) UNIQUE NOT NULL,
+   status boolean              -- Ativo ou Inativo, se inativo a hashtag não é usada na busca
+);
+
+
+--Drop Table TB_Tweets;
+
+-- Tabela de Tweets 
+CREATE TABLE TB_Tweets(
+   id serial PRIMARY KEY,
+   id_hashtag int, 
+   msn_id varchar(50),                -- id do tweet 
+   msn varchar (1000),		      -- texto do status 
+   autor varchar (60),		      -- autor da mensagem
+   data_post varchar(60),	      -- data do post
+   retweet_count int,		      -- quantas vezes a mensagem foi retweetada
+   favorite_count int, 		      -- contagem aproximada de quantas vezes o Tweet foi marcado como favorito
+   data_pesquisa timestamp
+);
+
+ALTER TABLE TB_Tweets 
+ADD CONSTRAINT const_fk_hash_tweets FOREIGN KEY (id_hashtag) REFERENCES TB_hashtag (id);
+
+
+-- Drop table TB_Config;
+
+-- Tabela de configuração da busca/query
+CREATE TABLE TB_Config(
+   id serial PRIMARY KEY,
+   frequencia int,                    --frequencia de busca em horas 
+   consumerKey  varchar(100),         --https://developer.twitter.com/en/apps/17236613 (keys and Tokens)
+   consumerSecret varchar(100),       --https://developer.twitter.com/en/apps/17236613 (keys and Tokens)
+   accessToken varchar(100),          --https://developer.twitter.com/en/apps/17236613 (keys and Tokens)
+   accessTokenSecret varchar(100),    --https://developer.twitter.com/en/apps/17236613 (keys and Tokens)
+   count int,                         --quantidade de tweets que a query deve retornar (máximo 100)
+   language char(4),                  --Idioma do tweet
+   geoCodeLatitude double precision,  --Latidute da localização geográfica de interesse (pegar no google)
+   geoCodeLogitude double precision,  --Longitude da localização geográfica de interesse (pegar no google)
+   geoCodeRadius double precision,    --raio a partir da localização geográfica
+   geoCodeUnit char(2),               --Use "mi" for miles or "km" for kilometers
+   since char(10),                    --If specified, returns tweets with since the given date. Date should be formatted as YYYY-MM-DD
+   until char(10)                     --If specified, returns tweets with generated before the given date. Date should be formatted as YYYY-MM-DD
+);
+
+
+-- Drop table TB_Grupo_Hashtags;
+
+-- Tabela de grupos de hashtags
+-- pode-se criar configurações de busca diferentes para diferentes grupos de hashtags, incluindo a 
+-- utilização de Twitter apps diferentes 
+CREATE TABLE TB_Grupo_Hashtags(
+   id serial PRIMARY KEY,
+   id_hashtag int,
+   id_config int, 
+   descricao varchar(60)
+);
+
+ALTER TABLE TB_Grupo_Hashtags 
+ADD CONSTRAINT const_fk_hash_grup FOREIGN KEY (id_hashtag) REFERENCES TB_hashtag (id),
+ADD CONSTRAINT const_fk_cong_grup FOREIGN KEY (id_config) REFERENCES TB_Config (id);
+
+

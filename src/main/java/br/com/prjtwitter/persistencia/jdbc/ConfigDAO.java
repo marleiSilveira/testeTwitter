@@ -17,14 +17,27 @@ import br.com.prjtwitter.entidade.Hashtag;
  */
 public class ConfigDAO {
 	//pega conexao 
-	private Connection conexao = ConexaoFactory.getConnection();
+	private Connection conexao;
 	
 	
+	public ConfigDAO(Connection conexao) {
+		super();
+		setConexao(conexao);
+	}
+
+	public Connection getConexao() {
+		return conexao;
+	}
+
+	public void setConexao(Connection conexao) {
+		this.conexao = conexao;
+	}
+
 	/**
 	 * Inserir Config no DB
 	 * @param config (Config)
 	 */
-	public boolean insert(Config config) {
+	public boolean insert(Config config){
 		String sql = "insert into TB_config (frequencia, consumerKey, consumerSecret, accessToken, accessTokenSecret, "
 				+ "count, language, geoCodeLatitude, geoCodeLogitude, geoCodeRadius, geoCodeUnit, since, until) "
 				+ "values (?,?,?,?,?,?,?,?,?,?,?,?,?)";		
@@ -54,7 +67,6 @@ public class ConfigDAO {
 			e.printStackTrace();
 			return false; 
 		}
-		
 		return true; 
 		
 	}
@@ -63,7 +75,7 @@ public class ConfigDAO {
 	 * Alterar Config no DB
 	 * @param config (Config)
 	 */
-	public boolean update(Config config) {
+	public boolean update(Config config){
 		String sql = "update TB_config set frequencia = ?, consumerKey = ?, consumerSecret = ?, accessToken = ?, accessTokenSecret = ?, "
 				+ " count = ?, language = ?, geoCodeLatitude = ?, geoCodeLogitude = ?, geoCodeRadius = ?, geoCodeUnit = ?, since = ?, until = ? where id = ?";
 		
@@ -102,7 +114,7 @@ public class ConfigDAO {
 	 * Apagar Config do DB
 	 * @param id (int)
 	 */
-	public boolean delete(int id) {
+	public boolean delete(int id){
 		String sql = "delete from TB_config  where id = ?";
 
 		try {
@@ -163,14 +175,13 @@ public class ConfigDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;		
 	}	
 	
 	
 	/**
 	 * Busca todas as configuracoes do DB
-	 * @return lista de config (List<Config>)
+	 * @return lista de config (List<Config>) 
 	 */
 	public List<Config> buscarTudo(){
 		
@@ -210,7 +221,6 @@ public class ConfigDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return lista;		
 	}	
 	

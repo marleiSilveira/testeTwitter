@@ -15,8 +15,20 @@ import br.com.prjtwitter.entidade.Tweet;
  *
  */
 public class TweetDAO {
-	private Connection conexao = ConexaoFactory.getConnection();
+	private Connection conexao;
 	
+	public TweetDAO(Connection conexao) {
+		setConexao(conexao);
+	}
+
+	public Connection getConexao() {
+		return conexao;
+	}
+
+	public void setConexao(Connection conexao) {
+		this.conexao = conexao;
+	}
+
 	/**
 	 * Inserir Tweet no DB
 	 * @param tweet (Tweet)
@@ -45,13 +57,12 @@ public class TweetDAO {
 			e.printStackTrace();
 			return false;
 		}
-
 		return true; 
 	}
 	
 	/**
 	 * Alterar Tweet no DB
-	 * @param tweet (Tweet)
+	 * @param tweet (Tweet) 
 	 */
 	public boolean update(Tweet tweet){
 		String sql = "update TB_Tweets set id_hashtag = ?, msn_id = ?, msn = ?, autor = ?, data_post = ?, retweet_count = ?, favorite_count = ?, data_pesquisa = ?   where id = ?";
@@ -78,6 +89,7 @@ public class TweetDAO {
 			e.printStackTrace();
 			return false; 
 		}
+
 		return true; 
 	}
 
@@ -85,7 +97,7 @@ public class TweetDAO {
 	 * Apagar Tweet do DB
 	 * @param id (int)
 	 */
-	public boolean delete(int id) {
+	public boolean delete(int id){
 		String sql = "delete from TB_Tweets  where id = ?";
 
 		try {
@@ -108,8 +120,9 @@ public class TweetDAO {
 	
 	/**
 	 * Apagar todos os Tweets do DB
+	 * @throws SQLException 
 	 */
-	public boolean deleteAll() {
+	public boolean deleteAll(){
 		String sql = "delete from TB_Tweets";
 
 		try {
@@ -125,6 +138,7 @@ public class TweetDAO {
 			e.printStackTrace();
 			return false; 
 		}
+
 		return true; 
 		
 	}	
@@ -132,6 +146,7 @@ public class TweetDAO {
 	/**
 	 * Salvar Tweet, se Id = 0 entao insere no DB senao faz update
 	 * @param tweet (Tweet)
+	 * @throws SQLException 
 	 */	
 	public void salvar(Tweet tweet){
 		if(tweet.getId() != 0){
@@ -176,13 +191,12 @@ public class TweetDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return null;		
 	}	
 	
 	/**
 	 * Buscar todos os Tweets do DB
-	 * @return lista de Tweets (List<Tweet>)
+	 * @return lista de Tweets (List<Tweet>) 
 	 */
 	public List<Tweet> buscarTudo(){
 		
@@ -217,7 +231,6 @@ public class TweetDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return lista;		
 	}	
 	
@@ -261,7 +274,6 @@ public class TweetDAO {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return lista;		
 	}	
 	

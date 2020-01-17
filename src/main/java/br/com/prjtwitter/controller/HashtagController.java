@@ -1,6 +1,8 @@
 package br.com.prjtwitter.controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -11,7 +13,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+
+
+
 import br.com.prjtwitter.entidade.Hashtag;
+import br.com.prjtwitter.persistencia.jdbc.ConexaoFactory;
 import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
 
 /**
@@ -22,9 +28,28 @@ import br.com.prjtwitter.persistencia.jdbc.HashtagDAO;
 public class HashtagController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
       
+	private Connection conexao;
+
+
+	@Override
+	public void init() throws ServletException {
+		// TODO Auto-generated method stub
+		super.init();
+		this.conexao = ConexaoFactory.getConnection();
+	}
 	
-
-
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		try {
+			this.conexao.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.destroy();
+	}
+	
 	/**
 	 * http://localhost:8080/prjTwitter/HashtagController?operacao=<Operacao>&id=<Id>
 	 * Operacoes: 
@@ -42,14 +67,14 @@ public class HashtagController extends HttpServlet {
 		if (operacao.equals("exc")){
 			//Excluir hashtag
 			String id      = request.getParameter("id");
-			HashtagDAO hashDAO = new HashtagDAO(); 
+			HashtagDAO hashDAO = new HashtagDAO(this.conexao); 
 			hashDAO.delete(Integer.parseInt(id));      
 			//response.getWriter().print("excluido com sucesso");
 			response.sendRedirect("HashtagController?operacao=lis"); //recarrega a tela
 			
 		}else if (operacao.equals("lis")){
 			//listar todas as hashtags
-			HashtagDAO hashDAO = new HashtagDAO(); 
+			HashtagDAO hashDAO = new HashtagDAO(this.conexao); 
 			List<Hashtag> listaHash = hashDAO.buscarTudo(); 
 			//response.getWriter().print(listaHash);
 			request.setAttribute("lisHashtags", listaHash);
@@ -61,7 +86,7 @@ public class HashtagController extends HttpServlet {
 			//Alterar hashtag
 			String id      = request.getParameter("id");
 			
-			HashtagDAO hashDAO = new HashtagDAO(); 		
+			HashtagDAO hashDAO = new HashtagDAO(this.conexao); 		
 			Hashtag hashtag = hashDAO.buscarPorId(Integer.parseInt(id));
 			request.setAttribute("has", hashtag);
 			RequestDispatcher dispatcher = request.getRequestDispatcher("WEB-INF/formhashtag.jsp");
@@ -101,7 +126,7 @@ public class HashtagController extends HttpServlet {
 		}
 		
 		//grava no DB
-		HashtagDAO hashDAO = new HashtagDAO(); 
+		HashtagDAO hashDAO = new HashtagDAO(this.conexao); 
 		hashDAO.salvar(hash);
 		
 		//response.getWriter().print("Hashtag Salva");
