@@ -1,4 +1,5 @@
 # TwitterWatcher 
+Visualizar a aplicação: [App-deployed](https://vast-sierra-24291.herokuapp.com/HashtagController?operacao=lis)
 
 O TwitterWatcher é um aplicativo web que busca Tweets com base em Hashtags préviamente cadastradas. 
 
